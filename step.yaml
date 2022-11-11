@@ -1,0 +1,1229 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: Swagger Step
+  description: Step Api
+tags:
+  - name: identity
+  - name: ranking
+paths:
+  /connect/token:
+    post:
+      summary: Connect
+      operationId: Connect
+      tags:
+        - identity
+      security:
+        - noauthAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              oneOf:
+                - type: object
+                  title: LoginRequest
+                  required:
+                    - Username
+                    - password
+                    - client_id
+                    - client_secret
+                    - grant_type
+                    - scope
+                  properties:
+                    Username:
+                      type: string
+                    password:
+                      type: string
+                    client_id:
+                      type: string
+                    client_secret:
+                      type: string
+                    grant_type:
+                      type: string
+                    scope:
+                      type: string
+                - type: object
+                  title: RefreshTokenRequest
+                  required:
+                    - client_id
+                    - client_secret
+                    - grant_type
+                    - refresh_token
+                  properties:
+                    Username:
+                      type: string
+                    password:
+                      type: string
+                    client_id:
+                      type: string
+                    client_secret:
+                      type: string
+                    grant_type:
+                      type: string
+                    refresh_token:
+                      type: string
+                - type: object
+                  title: SocialLoginRequest
+                  required:
+                    - accessToken
+                    - client_secret
+                    - grant_type
+                    - refresh_token
+                  properties:
+                    accessToken:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    provider:
+                      type: string
+                    referralCode:
+                      type: string
+                    client_id:
+                      type: string
+                    client_secret:
+                      type: string
+                    grant_type:
+                      type: string
+                    scope:
+                      type: string
+                    adId:
+                      type: string
+                    adSetId:
+                      type: string
+                    campaignId:
+                      type: string
+                    source:
+                      type: string
+                    acquisitionSource:
+                      type: string
+                    terms:
+                      type: boolean
+                    newsletter:
+                      type: boolean
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: TokenDto
+                required:
+                  - access_token
+                  - refresh_token
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  registered:
+                    type: boolean
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/register:
+    post:
+      summary: Register
+      operationId: register
+      tags:
+        - identity
+      security:
+        - noauthAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+                - email
+                - firstName
+                - lastName
+                - password
+                - confirmPassword
+                - subscribeNewsletter
+                - terms
+              properties:
+                email:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+                subscribeNewsletter:
+                  type: boolean
+                terms:
+                  type: boolean
+                referral:
+                  type: string
+                adSetId:
+                  type: string
+                campaignId:
+                  type: string
+                source:
+                  type: string
+                acquisitionSource:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json: {}
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/getprofile:
+    get:
+      summary: Get Profile
+      operationId: get_profile
+      tags:
+        - identity
+      security:
+        - httpBearer: []
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDto'
+        '400':
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/confirmemail:
+    post:
+      summary: Confirm Email
+      operationId: confirm_email
+      tags:
+        - identity
+      security:
+        - noauthAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              title: ConfirmEmailRequest
+              required:
+                - UserId
+                - Code
+              properties:
+                UserId:
+                  type: string
+                Code:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/ResendEmail:
+    post:
+      summary: Resend Email
+      operationId: resend_email
+      tags:
+        - identity
+      security:
+        - noauthAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              title: ConfirmEmailRequest
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/ForgotPassword:
+    post:
+      summary: ForgotPassword
+      operationId: forgot_password
+      tags:
+        - identity
+      security:
+        - noauthAuth: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              title: ForgotPasswordRequest
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/terms:
+    post:
+      summary: Accept Terms
+      operationId: accept_terms
+      tags:
+        - identity
+      security:
+        - httpBearer: []
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/changeuserdata:
+    post:
+      summary: Change User Data
+      operationId: change_user_data
+      tags:
+        - identity
+      security:
+        - httpBearer: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              title: ChangeUserDataRequest
+              required:
+                - FirstName
+                - LastName
+              properties:
+                FirstName:
+                  type: string
+                LastName:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/changeemail:
+    post:
+      summary: Change Email
+      operationId: change_email
+      tags:
+        - identity
+      security:
+        - httpBearer: []
+      parameters:
+        - in: header
+          name: Accept-Language
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/changeusername:
+    post:
+      summary: Change Username
+      operationId: change_username
+      tags:
+        - identity
+      security:
+        - httpBearer: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - username
+              properties:
+                username:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/changepassword:
+    post:
+      summary: Change Password
+      operationId: change_password
+      tags:
+        - identity
+      security:
+        - httpBearer: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              title: ChangePasswordRequest
+              required:
+                - oldPassword
+                - newPassword
+                - confirmNewPassword
+              properties:
+                oldPassword:
+                  type: string
+                newPassword:
+                  type: string
+                confirmNewPassword:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/changecountry:
+    post:
+      summary: Change Country
+      operationId: change_country
+      tags:
+        - identity
+      security:
+        - httpBearer: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - country
+              properties:
+                country:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/newsletter:
+    post:
+      summary: Newsletter
+      operationId: newsletter
+      tags:
+        - identity
+      security:
+        - httpBearer: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - subscribe
+              properties:
+                subscribe:
+                  type: boolean
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/delete:
+    delete:
+      summary: Delete User
+      operationId: delete_user
+      tags:
+        - identity
+      security:
+        - httpBearer: []
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /api/account/resetpassword:
+    post:
+      summary: ResetPassword
+      operationId: reset_password
+      tags:
+        - identity
+      security:
+        - noauthAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              title: ResetPasswordRequest
+              required:
+                - userId
+                - code
+                - password
+                - confirmPassword
+              properties:
+                userId:
+                  type: string
+                code:
+                  type: string
+                password:
+                  type: string
+                confirmPassword:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/api/ranking/configs:
+    get:
+      summary: Get Ranking Config
+      operationId: get_ranking_config
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RankingConfigDto'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/api/ranking:
+    get:
+      summary: Get User Rankings
+      operationId: get_user_rankings
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: query
+          name: kind
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RankingDto'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      summary: Create Ranking
+      operationId: create_ranking
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              title: CreateRankingRequest
+              required:
+                - name
+                - start
+                - end
+                - kind
+                - public
+                - available_seats
+                - ranking_config
+                - join_fee
+              properties:
+                name:
+                  type: string
+                start:
+                  type: int
+                end:
+                  type: int
+                kind:
+                  type: string
+                public:
+                  type: boolean
+                available_seats:
+                  type: int
+                ranking_config:
+                  type: int
+                join_fee:
+                  $ref: '#/components/schemas/TicketDto'
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RankingDto'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/api/ranking/public:
+    get:
+      summary: Get Public Rankings
+      operationId: get_public_rankings
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: int
+        - in: query
+          name: batch
+          schema:
+            type: int
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RankingDto'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/api/ranking/featured:
+    get:
+      summary: Get Featured Rankings
+      operationId: get_featured_rankings
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: int
+        - in: query
+          name: batch
+          schema:
+            type: int
+        - in: query
+          name: kind
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RankingDto'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  '/v2/api/ranking/{rankingId}':
+    get:
+      summary: Get Ranking By Id
+      operationId: get_ranking_by_id
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: path
+          name: rankingId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RankingDto'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    delete:
+      summary: Delete ranking
+      operationId: delete_ranking
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: path
+          name: rankingId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  '/v2/api/ranking/{rankingId}/join':
+    post:
+      summary: Join Ranking
+      operationId: join_ranking
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: path
+          name: rankingId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              title: JoinRankingRequest
+              properties:
+                passcode:
+                  type: string
+      responses:
+        '200':
+          description: Success Response
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/api/history:
+    get:
+      summary: Get Ranking History
+      operationId: get_rankgin_history
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: int
+        - in: query
+          name: batch
+          schema:
+            type: int
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RankingDto'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  '/v2/api/ranking/{rankingId}/participants':
+    get:
+      summary: Get Ranking Participants
+      operationId: get_ranking_participants
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: path
+          name: rankingId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: int
+        - in: query
+          name: batch
+          schema:
+            type: int
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: RankingParticipantPaginationDto
+                required:
+                  - ranks
+                  - total_count
+                properties:
+                  ranks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserRankDto'
+                  total_count:
+                    type: int
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  '/v2/api/history/{rankingId}/participants':
+    get:
+      summary: Get History Ranking Participants
+      operationId: get_history_ranking_participants
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: path
+          name: rankingId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: int
+        - in: query
+          name: batch
+          schema:
+            type: int
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: object
+                title: RankingParticipantPaginationDto
+                required:
+                  - ranks
+                  - total_count
+                properties:
+                  ranks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserRankDto'
+                  total_count:
+                    type: int
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /v2/api/ranking/search:
+    get:
+      summary: Search Rankings
+      operationId: search_rankings
+      tags:
+        - ranking
+      security:
+        - httpBearer: []
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  title: RankingSearchDto
+                  required:
+                    - id
+                    - name
+                    - creator_name
+                    - creator_image
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    creator_name:
+                      type: string
+                    creator_image:
+                      type: string
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  securitySchemes:
+    httpBearer:
+      type: http
+      scheme: bearer
+  schemas:
+    ApiError:
+      type: object
+      title: ApiError
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        error_description:
+          type: string
+        properties:
+          type: object
+          additionalProperties:
+            type: object
+        model:
+          type: object
+          additionalProperties:
+            type: object
+    ProfileDto:
+      type: object
+      title: ProfileDto
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+        - hasPassword
+        - termsAccepted
+        - subscribedNewsletter
+        - exchangeId
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        profilePicture:
+          type: string
+        thumbnail:
+          type: string
+        username:
+          type: string
+        country:
+          type: string
+        hasPassword:
+          type: boolean
+        termsAccepted:
+          type: boolean
+        subscribedNewsletter:
+          type: boolean
+        exchangeId:
+          type: int
+    RankingConfigDto:
+      type: object
+      title: RankingConfigDto
+      required:
+        - name
+        - min_participants
+        - max_participants
+        - min_duration
+        - max_duration
+        - interval
+        - color
+        - prizes_percentages
+        - join_config
+      properties:
+        name:
+          type: string
+        min_participants:
+          type: int
+        max_participants:
+          type: int
+        min_duration:
+          type: int
+        max_duration:
+          type: int
+        interval:
+          type: int
+        color:
+          type: string
+        prizes_percentages:
+          type: array
+          items:
+            type: number
+        join_config:
+          type: object
+          additionalProperties:
+            type: object
+            title: JoinConfigDto
+            required:
+              - min_amount
+              - max_amount
+            properties:
+              min_amount:
+                type: string
+              max_amount:
+                type: string
+    RankingDto:
+      type: object
+      title: RankingDto
+      required:
+        - id
+        - name
+        - start
+        - end
+        - kind
+        - available_seats
+        - min_participants
+        - public
+        - members_count
+        - color
+        - prize
+        - join_fee
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        start:
+          type: int
+        end:
+          type: int
+        kind:
+          type: string
+        available_seats:
+          type: int
+        min_participants:
+          type: int
+        public:
+          type: boolean
+        deep_link:
+          type: string
+        prizes_percentages:
+          type: array
+          items:
+            type: number
+        members_count:
+          type: int
+        color:
+          type: string
+        featured:
+          type: boolean
+        image_url:
+          type: string
+        prize:
+          $ref: '#/components/schemas/TicketDto'
+        join_fee:
+          $ref: '#/components/schemas/TicketDto'
+        creator_info:
+          $ref: '#/components/schemas/CreatorInfoDto'
+        creator_id:
+          type: string
+        user_rank:
+          $ref: '#/components/schemas/UserRankDto'
+        passcode:
+          type: string
+        status:
+          type: string
+        winners:
+          type: array
+          items:
+            type: object
+            title: WinnerDto
+            required:
+              - user_id
+              - position
+              - score
+              - reward
+            properties:
+              user_id:
+                type: string
+              position:
+                type: int
+              score:
+                type: number
+              reward:
+                $ref: '#/components/schemas/TicketDto'
+        terms_url:
+          type: string
+    TicketDto:
+      type: object
+      title: TicketDto
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+    CreatorInfoDto:
+      type: object
+      title: CreatorInfoDto
+      required:
+        - userId
+        - name
+        - profilePicture
+        - thumbnail
+      properties:
+        userId:
+          type: string
+        name:
+          type: string
+        profilePicture:
+          type: string
+        thumbnail:
+          type: string
+    UserRankDto:
+      type: object
+      title: UserRankDto
+      required:
+        - userId
+        - name
+        - profilePicture
+        - thumbnail
+        - position
+        - score
+      properties:
+        userId:
+          type: string
+        name:
+          type: string
+        profilePicture:
+          type: string
+        thumbnail:
+          type: string
+        position:
+          type: int
+        score:
+          type: number
+  responses:
+    ProfileResponse:
+      description: Profile Body
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ProfileDto'
